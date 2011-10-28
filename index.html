@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ZODB and Pyramid</title>
+        <style>
+          body {
+            background-color: black;
+            color: white;
+            margin: 2em;
+            font: 12pt Lucidatypewriter,monospace;
+          }
+
+          h1,h2,h3,h4,h5,h6 {
+            font-face: Helvetica, sans-serif;
+          }
+
+          h1 { font-size: 40pt; }
+          h2 { font-size: 30pt; }
+          h3 { font-size: 25pt; }
+          h4 { font-size: 20pt; }
+
+          a:link { text-decoration: none; color: lightblue; }
+          a:visited { text-decoration: none; color: lightblue; }
+          a:active { text-decoration: none; color: white; }
+          a:hover { text-decoration: none; color: white; }
+
+          .container {
+            width: 780px;
+            margin: auto;
+          }
+
+          .slide {
+            padding: 1em;
+            background-color: #101010;
+            border: solid 1px darkgray;
+          }
+
+          pre {
+            padding: 1em;
+            background-color: #191919;
+            border: solid 1px darkgray;
+          }
+
+          li {
+            margin: 0.5em 1em 0.5em 1em;
+          }
+
+          #nav {
+            position: absolute;
+            top: 5px;
+            text-align: center;
+            width: 100%;
+          }
+
+          #nav span {
+              margin: 0 5em 0 5em;
+          }
+        </style>
+
+        <script type="text/javascript" src="jquery.min.js"></script>
+
+        <script type="text/javascript">
+            var slides = null;
+            var index = -1;
+            var frames = null;
+            var findex = -1;
+
+            function forward(speed) {
+                if ( frames && findex < frames.length ) {
+                    $(frames.get(findex)).show(speed);
+                    findex++;
+                }
+                else {
+                    forward_slide(speed);
+                  }
+            }
+
+            function forward_slide(speed) {
+                if ( index >= 0 && index < slides.length ) {
+                    $(slides.get(index)).hide(speed);
+                }
+                if ( index < slides.length ) {
+                    index++;
+                }
+                if ( index < slides.length ) {
+                    slide = slides.get(index);
+                    $(slide).show(speed);
+                    frames = $(slide).find(".frame");
+                    findex = 0;
+                }
+                else {
+                    frames = null;
+                }
+            }
+
+            function backward(speed) {
+                if ( frames && findex > 0 ) {
+                    findex--;
+                    $(frames.get(findex)).hide(speed);
+                }
+                else {
+                    backward_slide(speed);
+                }
+            }
+
+            function backward_slide(speed) {
+                if ( index < slides.length && index >= 0 ) {
+                    $(slides.get(index)).hide(speed);
+                }
+                if ( index > 0 ) {
+                    index--;
+                    slide = slides.get(index);
+                    $(slide).show(speed);
+                    frames = $(slide).find(".frame");
+                    findex = frames.length;
+                }
+                else {
+                    frames = null;
+                }
+            }
+
+            function handle_key(e) {
+                if (e.which == 108) { // L key
+                    forward(0);
+                }
+                if (e.which == 104) { // H key
+                    backward(0);
+                }
+                if (e.which == 32) { // space bar
+                    forward(500);
+                }
+            }
+
+            var nav_timer = null;
+
+            function show_nav() {
+                $("#nav").fadeIn(100);
+            }
+
+            function hide_nav() {
+                $("#nav").fadeOut(1000);
+                nav_timer = null;
+            }
+
+            function handle_mouse_move(e) {
+                if ( nav_timer == null ) {
+                    show_nav();
+                }
+                else {
+                    clearTimeout(nav_timer);
+                }
+                nav_timer = setTimeout("hide_nav()", 5000);
+            }
+
+            function wire_nav() {
+                $("#nav #prev a").click(function(e){
+                    //e.preventDefault();
+                    e.stopPropagation();
+                    backward(0);
+                });
+                $("#nav #next a").click(function(e){
+                    //e.preventDefault();
+                    e.stopPropagation();
+                    forward(0);
+                });
+                hide_nav();
+            }
+
+            $(document).ready(function(){
+                $(".slide").css("display", "none");
+                $(".frame").css("display", "none");
+                slides = $(".slide");
+                $(document).click(function(){
+                    forward(500);
+                });
+                $(document).keypress(handle_key)
+                           .mousemove(handle_mouse_move);
+                wire_nav();
+                forward(0);
+            });
+
+        </script>
+    </head>
+  <body>
+    <div id="nav">
+      <span id="prev"><a href="#">prev</a> (h)</span>
+      <span id="next"><a href="#">next</a> (l)</span>
+    </div>
+    <div class="container">
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h1>ZODB and Pyramid</h1>
+        <h2>How to have your cake and eat it too.</h2>
+
+        <p>
+          This presentation, with sample source code, may be downloaded
+          here:
+        </p>
+        <p>
+          <a href="http://archimedeanco.com/wsgi-tutorial.tar.gz">
+            http://archimedeanco.com/wsgi-tutorial.tar.gz
+          </a>
+        </p>
+        <p>
+          Click mouse or press spacebar to advance slides.
+        </p>
+        <p>
+          &copy; 2011 Chris Rossi
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>ZODB Outside of Zope</h2>
+
+        <h4>It's easy to use the ZODB with anything.
+            Pyramid is not special.</h4>
+
+        <p class="frame">
+          One
+        </p>
+        <p class="frame">
+          Two
+        </p>
+
+        <pre class="frame">
+def application(environ, start_response)</pre>
+      </div>
+
+      <!-- ================================================================ -->
+
+    </div> <!-- container -->
+  </body>
+</html>
