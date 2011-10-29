@@ -7,3 +7,6 @@ downloads
 eggs
 include
 lib
+develop-eggs
+var
+.coverage
