@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html metal:use-macro="owrap.macros['master']">
+    <div metal:fill-slot="content">
+        <img tal:condition="img_url" src="${img_url}"
+             width="200" height="200" id="page-image"/>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-field">
+                <div class="label">Title</div>
+                <input type="text" name="title" value="${page.title}"/>
+            </div>
+            <div class="form-field">
+                <div class="label">Body</div>
+                <textarea name="body" cols="80" rows="25">${page.body}</textarea>
+            </div>
+            <div class="form-field">
+                <div class="label">Image</div>
+                <input type="file" name="image"/>
+            </div>
+            <div class="form-field">
+                <input type="submit" name="save" value="Save Changes"/>
+                <input type="submit" name="cancel" value="Cancel"/>
+            </div>
+        </form>
+    </div>
+</html>

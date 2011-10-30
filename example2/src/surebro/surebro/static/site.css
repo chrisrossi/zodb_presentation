@@ -1,0 +1,59 @@
+body {
+    background-color: lightgray;
+    font-family: arial,helvetica,verdana;
+    text-align: center;
+}
+
+#container {
+    background-color: white;
+    border: 1px solid darkgray;
+    text-align: left;
+    padding: 1em;
+}
+
+#header {
+    background-color: lightblue;
+    border: 1px solid darkblue;
+    padding: 1em;
+}
+
+#navigation {
+    border: 1px dashed darkgray;
+}
+
+#navigation ul {
+    list-style: none;
+}
+
+#navigation li {
+    display: inline;
+    margin-right: 1em;
+}
+
+#page-image {
+    float: right;
+}
+
+#actions {
+    border: 1px dashed lightblue;
+    font-size: small;
+    padding: 0.5em;
+}
+
+#actions .action {
+    margin-right: 1em;
+}
+
+form {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.form-field {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+a.missing:link, a.missing:visited {
+    color: red;
+}
