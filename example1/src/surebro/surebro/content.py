@@ -1,6 +1,5 @@
 import re
 
-from docutils.core import publish_parts
 from persistent import Persistent
 from repoze.folder import Folder
 from shutil import copyfileobj
