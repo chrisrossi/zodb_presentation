@@ -4,6 +4,8 @@
         <img tal:condition="img_url" src="${img_url}"
              width="200" height="200" id="page-image"/>
         <form method="POST" enctype="multipart/form-data">
+            <input tal:condition="exists: backto" type="hidden"
+                   name="backto" value="${backto}"/>
             <div class="form-field">
                 <div class="label">Title</div>
                 <input type="text" name="title" value="${page.title}"/>

@@ -114,16 +114,20 @@ def add_page(context, request):
         return HTTPFound(request.resource_url(page))
 
     elif 'cancel' in params:
-        redirect_to = request.referer
+        redirect_to = params['backto']
         if not redirect_to:
             redirect_to = request.resource_url(context)
         return HTTPFound(redirect_to)
 
     # Show form
+    backto = request.referer
+    if backto is None:
+        backto = ''
     return {
         'title': 'New Page',
         'img_url': None,
-        'page': Page('Page Title', '')
+        'page': Page('Page Title', ''),
+        'backto': backto,
     }
 
 
