@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html metal:use-macro="owrap.macros['master']">
+    <div metal:fill-slot="content">
+        <img tal:condition="img_url" src="${img_url}"
+             width="200" height="200" id="page-image"/>
+         <div tal:content="structure body">
+            Page content.
+        </div>
+        <div id="actions" tal:condition="actions">
+            <span tal:repeat="action actions" class="action">
+                <a href="${action['url']}">${action['title']}</a>
+            </span>
+        </div>
+    </div>
+</html>

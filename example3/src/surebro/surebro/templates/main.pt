@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html metal:define-macro="master">
+  <head>
+    <title>${title}</title>
+    <link type="text/css" rel="stylesheet" href="${static_url}/site.css"/>
+    <script type="text/javascript" src="${static_url}/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('a').each(function(index, element) {
+          element = $(element);
+          if (element.attr('href').indexOf('add_page') >= 0) {
+            element.addClass('missing');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+
+    <div id="container">
+      <div id="header">
+        <h1>${title}</h1>
+      </div>
+
+      <div id="navigation">
+        <div id="search">
+          <form action="${search_url}" method="GET">
+            <input type="text" name="term"
+                   value="${request.params.get('term', '')}"/>
+            <input type="submit" value="Search"/>
+          </form>
+        </div>
+        <ul>
+          <li tal:repeat="link nav">
+            <a href="${link['url']}">${link['title']}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="content">
+        <metal:block define-slot="content">Content goes here...</metal:block>
+      </div>
+    </div>
+
+  </body>
+</html>
