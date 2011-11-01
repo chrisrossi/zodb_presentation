@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html metal:use-macro="owrap.macros['master']">
+    <div metal:fill-slot="content">
+        <h2>Search Results</h2>
+        <p tal:condition="not results">No items match your search criteria.</p>
+        <ul tal:condition="results">
+          <li tal:repeat="result results">
+            <a href="${request.resource_url(result)}">${result.title}</a>
+          </li>
+        </ul>
+    </div>
+</html>
