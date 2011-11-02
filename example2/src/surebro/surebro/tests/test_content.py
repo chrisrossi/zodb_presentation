@@ -1,28 +1,18 @@
-from pyramid import testing
-
+import mock
 import unittest
+from pyramid import testing
 
 
 class TestSite(unittest.TestCase):
 
-    def make_one(self, title):
+    def make_one(self, title, body):
         from surebro.content import Site as test_class
-        return test_class(title)
+        return test_class(title, body)
 
     def test_construction(self):
-        from repoze.folder import Folder
-        site = self.make_one('The Title')
-        self.assertEqual(site.title, 'The Title')
-        self.failUnless(isinstance(site, Folder))
-
-    def test_folderish(self):
-        class Dummy(object):
-            def __init__(self, value):
-                self.value = value
-
-        site = self.make_one('The Title')
-        site['foo'] = Dummy('bar')
-        self.assertEqual(site['foo'].value, 'bar')
+        page = self.make_one('The Title', 'The Body')
+        self.assertEqual(page.title, 'The Title')
+        self.assertEqual(page.body, 'The Body')
 
 
 class TestPage(unittest.TestCase):
@@ -32,7 +22,6 @@ class TestPage(unittest.TestCase):
         return test_class(title, body)
 
     def test_construction(self):
-        from persistent import Persistent
         page = self.make_one('The Title', 'The Body')
         self.assertEqual(page.title, 'The Title')
         self.assertEqual(page.body, 'The Body')
@@ -45,15 +34,25 @@ class TestPage(unittest.TestCase):
         self.assertEqual(page.image.mimetype, 'image/test')
         self.assertEqual(page.image.data.open().read(), 'TESTDATA')
 
+    def test_folderish(self):
+        class Dummy(object):
+            def __init__(self, value):
+                self.value = value
+
+        site = self.make_one('The Title', 'The Body')
+        site['foo'] = Dummy('bar')
+        self.assertEqual(site['foo'].value, 'bar')
+
     def test_html(self):
+        from surebro.content import Page
         site = testing.DummyResource()
         site['page1'] = page = self.make_one("Page One",
-            "Nice page\n"
-            "---------\n"
-            "\n"
-            "It links to `another page <[[page2]]>`_.\n"
-            "It also links to a `page that doesn't exist <[[page3]]>`_\n")
-        site['page2'] = testing.DummyResource()
+            u"Nice page\n"
+            u"---------\n"
+            u"\n"
+            u"It links to `another page <[[page2]]>`_.\n"
+            u"It also links to a `page that doesn't exist <[[page3]]>`_\n")
+        site['page2'] = mock.Mock(spec=Page)
 
         from pyramid.url import resource_url
         request = testing.DummyRequest()
@@ -61,10 +60,12 @@ class TestPage(unittest.TestCase):
             return resource_url(resource, request, *path, **kw)
 
         self.assertEqual(page.html(url),
-            u'<div class="document" id="nice-page">\n'
-            u'<h1 class="title">Nice page</h1>\n'
+            u'<div class="document">\n'
+            u'<div class="section" id="nice-page">\n'
+            u'<h2>Nice page</h2>\n'
             u'<p>It links to <a class="reference external" '
             u'href="http://example.com/page2/">another page</a>.\n'
             u'It also links to a <a class="reference external" '
             u'href="http://example.com/add_page?path=%2Fpage3">'
-            u'page that doesn\'t exist</a></p>\n</div>\n')
+            u'page that doesn\'t exist</a></p>\n'
+            u'</div>\n</div>\n')
