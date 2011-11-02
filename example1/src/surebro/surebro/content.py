@@ -6,19 +6,10 @@ from shutil import copyfileobj
 from ZODB.blob import Blob
 
 
-page_links = re.compile('<<([^>]+)>>')
-
-
-class Site(Folder):
-
-    def __init__(self, title):
-        super(Site, self).__init__()
-        self.title = title
-
-
-class Page(Persistent):
+class Page(Folder):
 
     def __init__(self, title, body):
+        super(Page, self).__init__()
         self.title = title
         self.body = body
         self.image = None
@@ -38,3 +29,7 @@ class Image(object):
         blobfd.close()
 
         self.data = blob
+
+
+class Site(Page):
+    pass
