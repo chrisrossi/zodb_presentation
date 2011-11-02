@@ -1,5 +1,5 @@
 ===========================
-ZODB Presentation Example 2
+ZODB Presentation Example 4
 ===========================
 
 To run example::
@@ -7,7 +7,7 @@ To run example::
     $ virtualenv --no-site-packages .
     $ bin/python bootstrap.py
     $ bin/buildout
-    $ bin/supervisord
+    $ bin/jove serve
 
 Point your web browser at::
 

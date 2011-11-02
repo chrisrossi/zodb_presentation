@@ -1,5 +1,5 @@
 ===========================
-ZODB Presentation Example 2
+ZODB Presentation Example 3
 ===========================
 
 To run example::
