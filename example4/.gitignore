@@ -10,3 +10,4 @@ lib
 develop-eggs
 var
 .coverage
+.mr.developer.cfg
