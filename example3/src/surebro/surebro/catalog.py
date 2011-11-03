@@ -35,7 +35,7 @@ def index_doc(doc):
 
 def unindex_doc(doc):
     catalog = find_catalog(doc)
-    document_map.remove_docid(doc.docid)
+    catalog.document_map.remove_docid(doc.docid)
     catalog.unindex_doc(doc.docid)
     del doc.docid
 
@@ -50,14 +50,6 @@ def get_docid(catalog, doc):
         # Assign new docid.
         docid = document_map.add(path)
         setattr(doc, 'docid', docid)
-
-    else:
-        # Check to see if document has been moved and update address in
-        # document map if so.
-        old_path = document_map.address_for_docid(docid)
-        if old_path != path:
-            document_map.remove_address(old_path)
-            document_map.add(path, docid)
 
     return docid
 

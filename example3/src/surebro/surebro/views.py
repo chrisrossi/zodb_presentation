@@ -89,8 +89,6 @@ def add_page(context, request):
 
         # Insert page into document tree
         path = params['path']
-        if not path.startswith('/'):
-            path = '/' + path
         try:
             prev = find_model(context, path)
 
@@ -157,7 +155,13 @@ def delete_page(context, request):
     assert not isinstance(context, Site)
     unindex_doc(context)
     folder = context.__parent__
-    del folder[context.__name__]
+    id = context.__name__
+    del folder[id]
+    if len(context):
+        new_context = Folder()
+        for k, v in context.items():
+            new_context[k] = v
+        folder[id] = new_context
     while not isinstance(folder, Page):
         folder = folder.__parent__
     return HTTPFound(request.resource_url(folder))
