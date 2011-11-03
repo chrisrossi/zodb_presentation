@@ -5,7 +5,6 @@ import transaction
 from surebro.content import Page
 from surebro.content import Site
 
-from ZODB.blob import BlobStorage
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
 

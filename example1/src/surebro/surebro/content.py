@@ -1,6 +1,3 @@
-import re
-
-from persistent import Persistent
 from repoze.folder import Folder
 from shutil import copyfileobj
 from ZODB.blob import Blob
