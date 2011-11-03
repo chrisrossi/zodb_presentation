@@ -1,186 +1,186 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>ZODB and Pyramid</title>
-        <style>
-          body {
-            background-color: black;
-            color: white;
-            margin: 2em;
-            font: 12pt Lucidatypewriter,monospace;
+  <head>
+    <title>ZODB and Pyramid</title>
+    <style>
+      body {
+        background-color: black;
+        color: white;
+        margin: 2em;
+        font: 12pt Lucidatypewriter,monospace;
+      }
+
+      h1,h2,h3,h4,h5,h6 {
+        font-face: Helvetica, sans-serif;
+      }
+
+      h1 { font-size: 40pt; }
+      h2 { font-size: 30pt; }
+      h3 { font-size: 25pt; }
+      h4 { font-size: 20pt; }
+
+      a:link { text-decoration: none; color: lightblue; }
+      a:visited { text-decoration: none; color: lightblue; }
+      a:active { text-decoration: none; color: white; }
+      a:hover { text-decoration: none; color: white; }
+
+      .container {
+        width: 780px;
+        margin: auto;
+      }
+
+      .slide {
+        padding: 1em;
+        background-color: #101010;
+        border: solid 1px darkgray;
+      }
+
+      pre {
+        padding: 1em;
+        background-color: #191919;
+        border: solid 1px darkgray;
+      }
+
+      li {
+        margin: 0.5em 1em 0.5em 1em;
+      }
+
+      #nav {
+        position: absolute;
+        top: 5px;
+        text-align: center;
+        width: 100%;
+      }
+
+      #nav span {
+          margin: 0 5em 0 5em;
+      }
+    </style>
+
+    <script type="text/javascript" src="jquery.min.js"></script>
+
+    <script type="text/javascript">
+      var slides = null;
+      var index = -1;
+      var frames = null;
+      var findex = -1;
+
+      function forward(speed) {
+          if ( frames && findex < frames.length ) {
+              $(frames.get(findex)).show(speed);
+              findex++;
           }
+          else {
+              forward_slide(speed);
+            }
+      }
 
-          h1,h2,h3,h4,h5,h6 {
-            font-face: Helvetica, sans-serif;
+      function forward_slide(speed) {
+          if ( index >= 0 && index < slides.length ) {
+              $(slides.get(index)).hide(speed);
           }
-
-          h1 { font-size: 40pt; }
-          h2 { font-size: 30pt; }
-          h3 { font-size: 25pt; }
-          h4 { font-size: 20pt; }
-
-          a:link { text-decoration: none; color: lightblue; }
-          a:visited { text-decoration: none; color: lightblue; }
-          a:active { text-decoration: none; color: white; }
-          a:hover { text-decoration: none; color: white; }
-
-          .container {
-            width: 780px;
-            margin: auto;
+          if ( index < slides.length ) {
+              index++;
           }
-
-          .slide {
-            padding: 1em;
-            background-color: #101010;
-            border: solid 1px darkgray;
+          if ( index < slides.length ) {
+              slide = slides.get(index);
+              $(slide).show(speed);
+              frames = $(slide).find(".frame");
+              findex = 0;
           }
-
-          pre {
-            padding: 1em;
-            background-color: #191919;
-            border: solid 1px darkgray;
+          else {
+              frames = null;
           }
+      }
 
-          li {
-            margin: 0.5em 1em 0.5em 1em;
+      function backward(speed) {
+          if ( frames && findex > 0 ) {
+              findex--;
+              $(frames.get(findex)).hide(speed);
           }
-
-          #nav {
-            position: absolute;
-            top: 5px;
-            text-align: center;
-            width: 100%;
+          else {
+              backward_slide(speed);
           }
+      }
 
-          #nav span {
-              margin: 0 5em 0 5em;
+      function backward_slide(speed) {
+          if ( index < slides.length && index >= 0 ) {
+              $(slides.get(index)).hide(speed);
           }
-        </style>
+          if ( index > 0 ) {
+              index--;
+              slide = slides.get(index);
+              $(slide).show(speed);
+              frames = $(slide).find(".frame");
+              findex = frames.length;
+          }
+          else {
+              frames = null;
+          }
+      }
 
-        <script type="text/javascript" src="jquery.min.js"></script>
+      function handle_key(e) {
+          if (e.which == 108) { // L key
+              forward(0);
+          }
+          if (e.which == 104) { // H key
+              backward(0);
+          }
+          if (e.which == 32) { // space bar
+              forward(500);
+          }
+      }
 
-        <script type="text/javascript">
-            var slides = null;
-            var index = -1;
-            var frames = null;
-            var findex = -1;
+      var nav_timer = null;
 
-            function forward(speed) {
-                if ( frames && findex < frames.length ) {
-                    $(frames.get(findex)).show(speed);
-                    findex++;
-                }
-                else {
-                    forward_slide(speed);
-                  }
-            }
+      function show_nav() {
+          $("#nav").fadeIn(100);
+      }
 
-            function forward_slide(speed) {
-                if ( index >= 0 && index < slides.length ) {
-                    $(slides.get(index)).hide(speed);
-                }
-                if ( index < slides.length ) {
-                    index++;
-                }
-                if ( index < slides.length ) {
-                    slide = slides.get(index);
-                    $(slide).show(speed);
-                    frames = $(slide).find(".frame");
-                    findex = 0;
-                }
-                else {
-                    frames = null;
-                }
-            }
+      function hide_nav() {
+          $("#nav").fadeOut(1000);
+          nav_timer = null;
+      }
 
-            function backward(speed) {
-                if ( frames && findex > 0 ) {
-                    findex--;
-                    $(frames.get(findex)).hide(speed);
-                }
-                else {
-                    backward_slide(speed);
-                }
-            }
+      function handle_mouse_move(e) {
+          if ( nav_timer == null ) {
+              show_nav();
+          }
+          else {
+              clearTimeout(nav_timer);
+          }
+          nav_timer = setTimeout("hide_nav()", 5000);
+      }
 
-            function backward_slide(speed) {
-                if ( index < slides.length && index >= 0 ) {
-                    $(slides.get(index)).hide(speed);
-                }
-                if ( index > 0 ) {
-                    index--;
-                    slide = slides.get(index);
-                    $(slide).show(speed);
-                    frames = $(slide).find(".frame");
-                    findex = frames.length;
-                }
-                else {
-                    frames = null;
-                }
-            }
+      function wire_nav() {
+          $("#nav #prev a").click(function(e){
+              //e.preventDefault();
+              e.stopPropagation();
+              backward(0);
+          });
+          $("#nav #next a").click(function(e){
+              //e.preventDefault();
+              e.stopPropagation();
+              forward(0);
+          });
+          hide_nav();
+      }
 
-            function handle_key(e) {
-                if (e.which == 108) { // L key
-                    forward(0);
-                }
-                if (e.which == 104) { // H key
-                    backward(0);
-                }
-                if (e.which == 32) { // space bar
-                    forward(500);
-                }
-            }
+      $(document).ready(function(){
+          $(".slide").css("display", "none");
+          $(".frame").css("display", "none");
+          slides = $(".slide");
+          $(document).click(function(){
+              forward(500);
+          });
+          $(document).keypress(handle_key)
+                     .mousemove(handle_mouse_move);
+          wire_nav();
+          forward(0);
+      });
 
-            var nav_timer = null;
-
-            function show_nav() {
-                $("#nav").fadeIn(100);
-            }
-
-            function hide_nav() {
-                $("#nav").fadeOut(1000);
-                nav_timer = null;
-            }
-
-            function handle_mouse_move(e) {
-                if ( nav_timer == null ) {
-                    show_nav();
-                }
-                else {
-                    clearTimeout(nav_timer);
-                }
-                nav_timer = setTimeout("hide_nav()", 5000);
-            }
-
-            function wire_nav() {
-                $("#nav #prev a").click(function(e){
-                    //e.preventDefault();
-                    e.stopPropagation();
-                    backward(0);
-                });
-                $("#nav #next a").click(function(e){
-                    //e.preventDefault();
-                    e.stopPropagation();
-                    forward(0);
-                });
-                hide_nav();
-            }
-
-            $(document).ready(function(){
-                $(".slide").css("display", "none");
-                $(".frame").css("display", "none");
-                slides = $(".slide");
-                $(document).click(function(){
-                    forward(500);
-                });
-                $(document).keypress(handle_key)
-                           .mousemove(handle_mouse_move);
-                wire_nav();
-                forward(0);
-            });
-
-        </script>
-    </head>
+    </script>
+  </head>
   <body>
     <div id="nav">
       <span id="prev"><a href="#">prev</a> (h)</span>
@@ -216,21 +216,435 @@
       <div class="slide">
         <h2>ZODB Outside of Zope</h2>
 
-        <h4>It's easy to use the ZODB with anything.
-            Pyramid is not special.</h4>
+        <h4>It's easy to use the ZODB with anything.</h4>
 
         <p class="frame">
-          One
-        </p>
-        <p class="frame">
-          Two
+          You don't need Plone, Zope, Pyramid or any other framework to use
+          ZODB. You can use it in anything you want.
         </p>
 
-        <pre class="frame">
-def application(environ, start_response)</pre>
+        <p class="frame">
+          ZODB as a persistent object store is particulary suited for
+          Zope-style traversal available in Pyramid.
+        </p>
+
       </div>
 
       <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Principal Abstractions</h2>
+
+        <h4>Storage</h4>
+
+        <p class="frame">
+          Storage is responsible for storing and retreiving serialized
+          persistent objects (aka pickles).
+        </p>
+
+        <p class="frame">
+          <b>FileStorage</b> stores persistent objects in a big file on disk.
+        </p>
+
+        <p class="frame">
+          <b>ClientStorage</b> talks to a ZEO server (which, in turn uses a
+          FileStorage) for storing and retreiving persistent objects over a
+          network connection.  ZEO allows multiple processes to access a ZODB
+          database concurrently.
+        </p>
+
+        <p class="frame">
+          <b>DemoStorage</b> is a volatile storage which stores pickles in RAM.
+          It can be useful for testing.  Unfortunately it does not support
+          blobs.
+        </p>
+
+        <h4 class="frame">DB</h4>
+
+        <p class="frame">
+          An instance of <i>ZODB.DB.DB</i> is responsible for connecting to a
+          storage, pickling and unpickling persistent objects.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Connecting to a Database</h2>
+
+        <pre class="frame">
+          from ZODB.DB import DB
+          from ZODB.FileStorage import FileStorage
+
+          storage = FileStorage('var/surebro.db', blob_dir='var/blobs')
+          db = DB(storage)
+          connection = db.open()
+          root = connection.root()
+        </pre>
+
+        <p class="frame">
+          <i>root</i> is an instance of
+          <i>persistent.mapping.PersistenMapping</i>.  It provides a dictionary
+          interface.
+        </p>
+        <p class="frame">
+          Adding an object to the root adds the object to the
+          database.
+        </p>
+        <p class="frame">
+           Starting at the root, we can create an arbitrary graph of
+          persistent Python objects.
+        </p>
+
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Persistent Objects</h2>
+
+        <div class="frame">
+          A persistent object is an instance of <i>persistent.Persistent</i>.
+        </div>
+
+        <pre class="frame">
+          from persistent import Persistent
+          import transaction
+
+          class Foo(Persistent):
+
+              def __init__(self, bar):
+                  self.bar = bar
+
+          foo = Foo('Hello, everybody!')
+          root['foo'] = foo
+          transaction.commit()
+        </pre>
+
+        <p class="frame">
+          The above code defines a persistent class, <i>Foo</i>, creates an
+          instance of <i>Foo</i>, <i>foo</i> and chains them together
+          to make a graph
+        </p>
+        <p class="frame">
+          The graph is attached to the database by adding it to the root.
+        </p>
+        <p class="frame">
+          Use the <i>transaction</i> module to save state back to the database.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Persistent Objects</h2>
+
+        <p class="frame">
+          <i>persistent.Persistent</i> forms a kind of boundary for storing
+          and loading objects.
+        </p>
+        <p class="frame">
+          When an object is written to the database, it is pickled.  During
+          pickling, if another persistent object is found, ZODB stores a
+          reference to the other persistent object, which is stored as a
+          seperate pickle.
+        </p>
+        <pre class="frame">
+          foo1 = Foo("I can store an arbitrary object graph.")
+          foo2 = Foo("I could make a linked list, if I wanted to.")
+          foo1.next = foo2
+          root['head'] = foo1
+        </pre>
+        <p class="frame">
+          <i>foo1</i> and <i>foo2</i> are stored as two different records
+          in the database.  The <i>next</i> attribute of <i>foo1</i> is stored
+          as a reference to <i>foo2</i>.
+        </p>
+        <pre class="frame">
+          head = root['head'] # loads foo1, but not foo2
+          node = head.next    # still not loaded, it's a ghost
+          msg = node.bar      # trying to use an object causes it to be loaded
+        </pre>
+        <p class="frame">
+          If we didn't use <i>persistent.Persistent</i> this would all still
+          work, but everything would be stored in a single pickle and would
+          have to be loaded into RAM at once.  That doesn't really scale well.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Folders</h2>
+
+        <p class="frame">
+          <i>persistent.mapping.Mapping</i> is fine for storing a handful of
+          keys, but is essentially just a Python dict.  Requires all keys to
+          be loaded into memory at once.
+        </p>
+        <p class="frame">
+          ZODB provides the <i>BTrees</i> package which provides b-tree based
+          datastructures which can scale up to very many keys.
+        </p>
+        <p class="frame">
+          <i>repoze.folder</i> provides a higher level abstraction of a folder,
+          which uses a BTree for storage.  Provides a dict-like interface.
+        </p>
+        <p class="frame">
+          <i>repoze.folder.Folder</i> is traversable by Pyramid out of the box.
+        </p>
+        <p class="frame">
+          Although we can store arbitrary object graphs in ZODB, we tend to
+          store trees that look a lot like a filesystem.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Example Application</h2>
+        <h4>Sure, Bro!</h4>
+
+        <p class="frame">
+          Your friend says, "Hey dude, can you make me a brochure website for
+          my business?"
+        </p>
+        <p class="frame">
+          You want to be able to just say, "Sure, Bro!"
+        </p>
+        <p class="frame">
+          It's for brochure sites.  Get it?
+        </p>
+        <p class="frame">
+          Let's build a stupidly simple CMS as a demonstration of using
+          ZODB with Pyramid.
+        </p>
+        <p class="frame">
+          Too dumb for real life.
+        </p>
+        <p class="frame">
+          Follow along by reading and running the code in <i>example1</i>.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Ok, But How Do I Wire it Into Pyramid?</h2>
+        <h4><a href="http://docs.pylonsproject.org/projects/pyramid_zodbconn/dev/index.html">pyramid_zodbconn</a></h4>
+
+        <p class="frame">
+          <i>pyramid_zodbonn</i> makes using ZODB with Pyramid easy.
+        </p>
+
+        <p class="frame">
+          You need to do three things:
+          <ul>
+            <li class="frame">
+              Add <i>config.include('pyramid_zodbconn')</i> to your
+              configuration.
+            </li>
+            <li class="frame">
+              Add the <i>zodbconn.uri</i> parameter to your paster ini file
+              (or equivalent).
+            </li>
+            <li class="frame">
+              Write a root factory which calls
+              <i>pyramod_zodbconn.get_connection</i> to get the connection
+              and find an object to be the root of your site.
+            </li>
+          </ul>
+        </p>
+
+        <p class="frame">
+          <i>zodbconn.uri</i> is a connection string which describes how to
+          connect to the ZODB.  The format differs according to the storage
+          you use.  <span class="frame">See the
+          <a href="http://docs.pylonsproject.org/projects/pyramid_zodbconn/dev/index.html#uri-schemes">documentation</a>.
+        </p>
+
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Ok, But How Do I Commit the Transaction?</h2>
+        <h4><a href="http://docs.pylonsproject.org/projects/pyramid_tm/dev/index.html">pyramid_tm</a></h4>
+
+        <p class="frame">
+          Forget about it.  <span class="frame">Just use <i>pyramid_tm</i></span>.
+        </p>
+        <p class="frame">
+          Add <i>config.include('pyramid_tm')</i> to your configuration.
+        </p>
+        <p class="frame">
+          That's it.  You never need to import <i>transaction</i> or call
+          commit.
+        </p>
+        <p class="frame">
+          If your request completes without error, the transaction is committed.
+          If your view raises an exception, the transaction gets aborted.
+        </p>
+        <p class="frame">
+          <i>example2</i> shows wiring up the ZODB into a Pyramid application
+          and implements our basic brochure site CMS.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>So, how do I <a href="http://browsertoolkit.com/fault-tolerance.png">query</a>
+            the database?</h2>
+        <h4>Adding search with repoze.catalog</h4>
+
+        <p class="frame">
+          ZODB is a persistent object store. It has no relational database
+          semantics. <span class="frame">You don't query the database.</span>
+          <span class="frame">You traverse an object graph.</span>
+        </p>
+
+        <p class="frame">
+          Umm, ok. But what about search?
+        </p>
+
+        <p class="frame">
+          <i>repoze.catalog</i> is a search engine which stores search data
+          in ZODB.  It integrates seamlessly into your ZODB based application.
+        </p>
+
+        <p class="frame">
+          <i>repoze.catalog</i> is pretty much just the Zope Catalog ripped out
+          of Zope and made framework agnostic.  It makes as few assumptions as
+          possible.
+        </p>
+
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>I'm sold, how do I use it?</h2>
+
+        <p class="frame">
+          You create and store an instance of
+          <i>repoze.catalog.catalog.Catalog</i>.
+        </p>
+        <p class="frame">
+          You create indexes which capture the data you want to query. For
+          each index you provide a function, called a discriminator, which
+          knows how to extract the data to index from a content object.
+        </p>
+        <p class="frame">
+          You must have your own system that can can assign integer document
+          ids to content objects and which can retrieve a content object given
+          a document id.  <i>repoze.catalog</i> does not store your document
+          nor does it know where you store it.  The result of a query is a set
+          of document ids.
+        </p>
+        <p class="frame">
+          You index your content objects whenever they are created or modified
+          and unindex them when they are deleted.
+        </p>
+        <p class="frame">
+          You can then run a catalog query to search for content objects.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>The Document Map</h2>
+        <h4>repoze.catalog.document.DocumentMap</h4>
+
+        <p class="frame">
+          <i>repoze.catalog</i> does throw you a bone by providing a tool that
+          helps with one very common way of mapping content objects to document
+          ids.
+        </p>
+        <p class="frame">
+          An instance of <i>repoze.catalog.document.DocumentMap</i> can assign
+          new document ids and maps document ids to what it calls addresses.
+        </p>
+        <p class="frame">
+          In a Pyramid app we can use an object's traversal path as its
+          address.
+        </p>
+        <p class="frame">
+          This lets us use <i>pyramid.traversal.resource_path</i> to get an
+          address for an object and <i>pyramid.traversal.find_resource</i> to
+          find a resource given an address.
+        </p>
+        <p class="frame">
+          <i>example3</i> adds <i>repoze.catalog</i> to our sample app for
+          search.  It uses a single text index to search for content on the
+          site.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>repoze.pgtextindex</h2>
+
+        <p class="frame">
+          PostgreSQL has a full text search that is <i>really</i> good.
+        </p>
+        <p class="frame">
+          <i>repoze.pgtextindex</i> provides an index you can add to a catalog,
+          just like any other index, except that it talks to a PostgreSQL
+          database and uses its full text search capabilities.
+        </p>
+        <p class="frame">
+          Performance is significantly improved over the standard text index.
+        </p>
+        <p class="frame">
+          Document ranking is somewhat more sophisticated and far more
+          flexible.
+        </p>
+        <p class="frame">
+          Written by Shane Hathaway.
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>But, it isn't Oracle!</h2>
+        <h4>RelStorage</h4>
+
+        <p class="frame">
+          RelStorage is a ZODB storage which uses a relational database to
+          store pickles.
+        </p>
+
+        <p class="frame">
+          Makes the pointy haired boss happy because you can use RDBMS X.
+        </p>
+
+        <p class="frame">
+          In many cases performance is better than ZEO or FileStorage.
+          <span class="frame">Especially if you use memcached</span>.
+        </p>
+
+        <p class="frame">
+          Data is still opaque, though. <span class="frame">Fundamentally, it
+          just stores pickles in a table.</span> <span class="frame">You're not
+          going to query the ZODB using SQL.</span>
+        </p>
+
+        <p class="frame">
+          I have not actually used it with Oracle.  I have several sites
+          deployed using RelStorage with PostgreSQL.
+        </p>
+
+        <p class="frame">
+          Written by Shane Hathaway. <span class="frame">Shane is really
+          smart.</span>  <span class="frame">And he freelances.</span>
+        </p>
+        <p class="frame">
+          I don't get a kickback for that.
+        </p>
+      </div>
 
     </div> <!-- container -->
   </body>
