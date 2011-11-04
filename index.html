@@ -195,12 +195,11 @@
         <h2>How to have your cake and eat it too.</h2>
 
         <p>
-          This presentation, with sample source code, may be downloaded
-          here:
+          This presentation, with sample source code, is on GitHub:
         </p>
         <p>
-          <a href="http://archimedeanco.com/wsgi-tutorial.tar.gz">
-            http://archimedeanco.com/wsgi-tutorial.tar.gz
+          <a href="https://github.com/chrisrossi/zodb_presentation">
+            https://github.com/chrisrossi/zodb_presentation
           </a>
         </p>
         <p>
@@ -273,13 +272,13 @@
         <h2>Connecting to a Database</h2>
 
         <pre class="frame">
-          from ZODB.DB import DB
-          from ZODB.FileStorage import FileStorage
+from ZODB.DB import DB
+from ZODB.FileStorage import FileStorage
 
-          storage = FileStorage('var/surebro.db', blob_dir='var/blobs')
-          db = DB(storage)
-          connection = db.open()
-          root = connection.root()
+storage = FileStorage('var/surebro.db', blob_dir='var/blobs')
+db = DB(storage)
+connection = db.open()
+root = connection.root()
         </pre>
 
         <p class="frame">
@@ -308,23 +307,23 @@
         </div>
 
         <pre class="frame">
-          from persistent import Persistent
-          import transaction
+from persistent import Persistent
+import transaction
 
-          class Foo(Persistent):
+class Foo(Persistent):
 
-              def __init__(self, bar):
-                  self.bar = bar
+    def __init__(self, bar):
+        self.bar = bar
 
-          foo = Foo('Hello, everybody!')
-          root['foo'] = foo
-          transaction.commit()
+foo = Foo('Hello, everybody!')
+root['foo'] = foo
+transaction.commit()
         </pre>
 
         <p class="frame">
           The above code defines a persistent class, <i>Foo</i>, creates an
           instance of <i>Foo</i>, <i>foo</i> and chains them together
-          to make a graph
+          to make a graph.
         </p>
         <p class="frame">
           The graph is attached to the database by adding it to the root.
@@ -350,10 +349,10 @@
           seperate pickle.
         </p>
         <pre class="frame">
-          foo1 = Foo("I can store an arbitrary object graph.")
-          foo2 = Foo("I could make a linked list, if I wanted to.")
-          foo1.next = foo2
-          root['head'] = foo1
+foo1 = Foo("I can store an arbitrary object graph.")
+foo2 = Foo("I could make a linked list, if I wanted to.")
+foo1.next = foo2
+root['head'] = foo1
         </pre>
         <p class="frame">
           <i>foo1</i> and <i>foo2</i> are stored as two different records
@@ -361,9 +360,9 @@
           as a reference to <i>foo2</i>.
         </p>
         <pre class="frame">
-          head = root['head'] # loads foo1, but not foo2
-          node = head.next    # still not loaded, it's a ghost
-          msg = node.bar      # trying to use an object causes it to be loaded
+head = root['head'] # loads foo1, but not foo2
+node = head.next    # still not loaded, it's a "ghost" object
+msg = node.bar      # trying to use an object causes it to be loaded
         </pre>
         <p class="frame">
           If we didn't use <i>persistent.Persistent</i> this would all still
@@ -411,9 +410,7 @@
         </p>
         <p class="frame">
           You want to be able to just say, "Sure, Bro!"
-        </p>
-        <p class="frame">
-          It's for brochure sites.  Get it?
+          <span class="frame">It's for bro-chure sites.  Get it?</span>
         </p>
         <p class="frame">
           Let's build a stupidly simple CMS as a demonstration of using
@@ -472,7 +469,7 @@
         <h4><a href="http://docs.pylonsproject.org/projects/pyramid_tm/dev/index.html">pyramid_tm</a></h4>
 
         <p class="frame">
-          Forget about it.  <span class="frame">Just use <i>pyramid_tm</i></span>.
+          Forget about it.  <span class="frame">Just use <i>pyramid_tm</i>.</span>
         </p>
         <p class="frame">
           Add <i>config.include('pyramid_tm')</i> to your configuration.
@@ -500,10 +497,10 @@
 
         <p class="frame">
           ZODB is a persistent object store. It has no relational database
-          semantics. <span class="frame">You don't query the database.</span>
-          <span class="frame">You traverse an object graph.</span>
+          semantics.
         </p>
-
+        <p class="frame">You don't query the database.</p>
+        <p class="frame">You traverse an object graph.</p>
         <p class="frame">
           Umm, ok. But what about search?
         </p>
@@ -643,6 +640,39 @@
         </p>
         <p class="frame">
           I don't get a kickback for that.
+        </p>
+      </div>
+
+      <!-- ================================================================ -->
+
+      <div class="slide">
+        <h2>Jove</h2>
+        <h4>Going off the Reservation</h4>
+
+        <p class="frame">
+          Jove is a new something that I've written whose main goal in life is
+          to make deployment of many small sites easy.
+        </p>
+        <p class="frame">
+          It makes some assumptions that Pyramid doesn't.
+          <span class="frame">You will use ZODB.</span>
+          <span class="frame">You will probably use traversal.</span>
+        </p>
+        <p class="frame">
+          It is vaguely pertinent for this talk because it makes working with
+          ZODB just a teeny bit easier.
+        </p>
+        <p class="frame">
+          Jove Catalog is an add-on for Jove which makes using the
+          catalog significantly easier.
+        </p>
+        <p class="frame">Since it can assume that your content
+          objects are findable using Pyramid traversal, it can handle the
+          mapping of documents to docids for you.
+        </p>
+        <p class="frame">
+          <i>example4</i> refactors our sample app to use Jove and Jove Catalog,
+          It's a bit less code.  A lot less for the catalog.
         </p>
       </div>
 
